@@ -105,15 +105,18 @@ class PgsqlSchemaParser extends AbstractSchemaParser
         $tableWraps = [];
 
         $this->parseTables($tableWraps, $database);
+	echo "Obtendo tabelas...";
         foreach ($additionalTables as $table) {
             $this->parseTables($tableWraps, $database, $table);
         }
 
+	echo "\nObtendo colunas...";
         // Now populate only columns.
         foreach ($tableWraps as $wrap) {
             $this->addColumns($wrap->table, $wrap->oid);
         }
 
+	echo "\nAdicionando indices e constraints...";
         // Now add indexes and constraints.
         foreach ($tableWraps as $wrap) {
             $this->addForeignKeys($wrap->table, $wrap->oid);
@@ -121,6 +124,7 @@ class PgsqlSchemaParser extends AbstractSchemaParser
             $this->addPrimaryKey($wrap->table, $wrap->oid);
         }
 
+	echo "\nAdicionando sequences...";
         $this->addSequences($database);
 
         return count($tableWraps);
@@ -128,6 +132,7 @@ class PgsqlSchemaParser extends AbstractSchemaParser
 
     protected function parseTables(&$tableWraps, Database $database, Table $filterTable = null)
     {
+	echo 'Database Schema: ' . $database->getSchema();
         $stmt = null;
 
         $params = [];
@@ -300,6 +305,7 @@ class PgsqlSchemaParser extends AbstractSchemaParser
                 $default = null;
             }
 
+            echo "\nTable: " . $table->getCommonName();
             $column = new Column($name);
             $column->setTable($table);
             $column->setDomainForType($propelType);
@@ -321,6 +327,7 @@ class PgsqlSchemaParser extends AbstractSchemaParser
             $column->setAutoIncrement($autoincrement);
             $column->setNotNull(!$isNullable);
 
+	    echo " | Column: " . $column->getName();
             $table->addColumn($column);
         }
     }
@@ -364,6 +371,8 @@ class PgsqlSchemaParser extends AbstractSchemaParser
             $localColumns = explode(',', trim($row['fkcols'], '{}'));
             $foreignTableName = $row['reftab'];
             $foreignColumns = explode(',', trim($row['refcols'], '{}'));
+
+	    echo "\nConstraint name: " . $name;
 
             // On Update
             switch ($row['confupdtype']) {
@@ -572,6 +581,7 @@ class PgsqlSchemaParser extends AbstractSchemaParser
 
         while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
             $name = $row['nspname'] . '.' . $row['relname'];
+	    echo "\n Sequence: " . $name;
             $database->addSequence($name);
         }
     }

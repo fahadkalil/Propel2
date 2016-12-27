@@ -29,6 +29,12 @@ class ReverseManager extends AbstractManager
     /**
      * @var string|null
      */
+    private $sqlSchema;
+
+
+    /**
+     * @var string|null
+     */
     private $namespace;
 
     /**
@@ -102,6 +108,20 @@ class ReverseManager extends AbstractManager
     {
         $this->schemaName = $schemaName;
     }
+
+// ---------------------------------------------
+
+    public function getSqlSchema()
+    {
+        return $this->sqlSchema;
+    }
+
+    public function setSqlSchema($sqlSchema)
+    {
+        $this->sqlSchema = $sqlSchema;
+    }
+
+// ---------------------------------------------
 
     /**
      * Gets the (optional) php namespace to use.
@@ -213,6 +233,8 @@ class ReverseManager extends AbstractManager
         $database = new Database($this->getDatabaseName());
         $database->setPlatform($config->getConfiguredPlatform($connection), $databaseName);
         $database->setDefaultIdMethod(IdMethod::NATIVE);
+	$database->setSchema($this->getSqlSchema());
+
 
         $this->getNamespace() && $database->setNamespace($this->getNamespace());
 

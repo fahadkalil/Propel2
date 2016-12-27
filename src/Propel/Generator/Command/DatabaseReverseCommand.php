@@ -38,6 +38,7 @@ class DatabaseReverseCommand extends AbstractCommand
             ->addOption('database-name', null, InputOption::VALUE_REQUIRED, 'The database name used in the created schema.xml. If not defined we use `connection`.')
             ->addOption('schema-name',   null, InputOption::VALUE_REQUIRED, 'The schema name to generate', self::DEFAULT_SCHEMA_NAME)
             ->addOption('namespace',     null, InputOption::VALUE_OPTIONAL, 'The PHP namespace to use for generated models')
+	    ->addOption('sql-schema',    null, InputOption::VALUE_OPTIONAL, 'The database schema, e.g. Postgresql \'public\' schema')
             ->addArgument(
                 'connection',
                 InputArgument::OPTIONAL,
@@ -90,9 +91,10 @@ class DatabaseReverseCommand extends AbstractCommand
         $manager->setWorkingDirectory($input->getOption('output-dir'));
         $manager->setDatabaseName($input->getOption('database-name'));
         $manager->setSchemaName($input->getOption('schema-name'));
+	$manager->setSqlSchema($input->getOption('sql-schema'));
 
         $namespace = $input->getOption('namespace');
-        
+
         if ($namespace) {
             $manager->setNamespace($namespace);
         }

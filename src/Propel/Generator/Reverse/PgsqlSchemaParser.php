@@ -105,7 +105,7 @@ class PgsqlSchemaParser extends AbstractSchemaParser
         $tableWraps = [];
 
         $this->parseTables($tableWraps, $database);
-	echo "Obtendo tabelas...";
+	echo "\nObtendo tabelas...";
         foreach ($additionalTables as $table) {
             $this->parseTables($tableWraps, $database, $table);
         }
@@ -116,7 +116,7 @@ class PgsqlSchemaParser extends AbstractSchemaParser
             $this->addColumns($wrap->table, $wrap->oid);
         }
 
-	echo "\nAdicionando indices e constraints...";
+	echo "\nObtendo indices e constraints...";
         // Now add indexes and constraints.
         foreach ($tableWraps as $wrap) {
             $this->addForeignKeys($wrap->table, $wrap->oid);
@@ -124,7 +124,7 @@ class PgsqlSchemaParser extends AbstractSchemaParser
             $this->addPrimaryKey($wrap->table, $wrap->oid);
         }
 
-	echo "\nAdicionando sequences...";
+	echo "\nObtendo sequences...";
         $this->addSequences($database);
 
         return count($tableWraps);
@@ -132,7 +132,7 @@ class PgsqlSchemaParser extends AbstractSchemaParser
 
     protected function parseTables(&$tableWraps, Database $database, Table $filterTable = null)
     {
-	echo 'Database Schema: ' . $database->getSchema();
+	echo "\nDatabase Schema: " . $database->getSchema();
         $stmt = null;
 
         $params = [];
@@ -310,6 +310,10 @@ class PgsqlSchemaParser extends AbstractSchemaParser
             $column->setTable($table);
             $column->setDomainForType($propelType);
             $column->getDomain()->replaceSize($size);
+            if ($column->getType() == 'BOOLEAN') {
+                $column->setSize(null);
+            }
+
             if ($scale) {
                 $column->getDomain()->replaceScale($scale);
             }

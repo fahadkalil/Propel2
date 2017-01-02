@@ -290,7 +290,11 @@ class PgsqlSchemaParser extends AbstractSchemaParser
                     $autoincrement = true;
                     // extract the name of an already created sequence
                     if (preg_match("/'([^\']+)'/", $default, $m)) {
-                        $sequenceName = explode(".",$m[1])[1];
+                        $sequenceName = $m[1];
+                        if (empty($table->getSchema()) != 1) {
+                            $sequenceName = explode(".",$m[1])[1];
+                        }
+
                         $imp = new IdMethodParameter();
                         $imp->setValue($sequenceName);
                         $table->addIdMethodParameter($imp);

@@ -105,23 +105,23 @@ class PgsqlSchemaParser extends AbstractSchemaParser
     {
         $tableWraps = [];
 
-	echo "\nObtendo sequences...";
+    	echo "\nObtendo sequences...";
         $this->addSequences($database);
 
 
         $this->parseTables($tableWraps, $database);
-	echo "\nObtendo tabelas...";
+	    echo "\nObtendo tabelas...";
         foreach ($additionalTables as $table) {
             $this->parseTables($tableWraps, $database, $table);
         }
 
-	echo "\nObtendo colunas...";
+    	echo "\nObtendo colunas...";
         // Now populate only columns.
         foreach ($tableWraps as $wrap) {
             $this->addColumns($wrap->table, $wrap->oid);
         }
 
-	echo "\nObtendo indices e constraints...";
+	    echo "\nObtendo indices e constraints...";
         // Now add indexes and constraints.
         foreach ($tableWraps as $wrap) {
             $this->addForeignKeys($wrap->table, $wrap->oid);
@@ -129,6 +129,7 @@ class PgsqlSchemaParser extends AbstractSchemaParser
             $this->addPrimaryKey($wrap->table, $wrap->oid);
         }
 
+        echo "\n";
 
         return count($tableWraps);
     }
@@ -387,7 +388,7 @@ class PgsqlSchemaParser extends AbstractSchemaParser
             $foreignTableName = $row['reftab'];
             $foreignColumns = explode(',', trim($row['refcols'], '{}'));
 
-	    echo "\nConstraint name: " . $name;
+	        echo "\nConstraint name: " . $name;
 
             // On Update
             switch ($row['confupdtype']) {

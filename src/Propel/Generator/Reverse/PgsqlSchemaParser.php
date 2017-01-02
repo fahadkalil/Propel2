@@ -18,6 +18,7 @@ use Propel\Generator\Model\Index;
 use Propel\Generator\Model\PropelTypes;
 use Propel\Generator\Model\Table;
 use Propel\Generator\Model\Unique;
+use Propel\Generator\Model\IdMethodParameter;
 
 /**
  * Postgresql database schema parser.
@@ -104,6 +105,10 @@ class PgsqlSchemaParser extends AbstractSchemaParser
     {
         $tableWraps = [];
 
+	echo "\nObtendo sequences...";
+        $this->addSequences($database);
+
+
         $this->parseTables($tableWraps, $database);
 	echo "\nObtendo tabelas...";
         foreach ($additionalTables as $table) {
@@ -124,8 +129,6 @@ class PgsqlSchemaParser extends AbstractSchemaParser
             $this->addPrimaryKey($wrap->table, $wrap->oid);
         }
 
-	echo "\nObtendo sequences...";
-        $this->addSequences($database);
 
         return count($tableWraps);
     }
@@ -284,6 +287,14 @@ class PgsqlSchemaParser extends AbstractSchemaParser
                     $strDefault= preg_replace('/::[\W\D]*/', '', $default);
                 } else {
                     $autoincrement = true;
+                    // extract the name of an already created sequence
+                    if (preg_match("/'([^\']+)'/", $default, $m)) {
+                        $sequenceName = explode(".",$m[1])[1];
+                        $imp = new IdMethodParameter();
+                        $imp->setValue($sequenceName);
+                        $table->addIdMethodParameter($imp);
+                    }
+
                     $default = null;
                 }
             } else {
